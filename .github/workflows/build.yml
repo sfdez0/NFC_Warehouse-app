@@ -1,0 +1,33 @@
+name: Android CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-java@v5
+        with:
+          java-version: 21
+          distribution: 'temurin'
+
+      - uses: gradle/actions/setup-gradle@v6
+
+      - name: Give execution permissions to Gradle
+        run: chmod +x gradlew
+
+      - name: Check formatting (Ktlint)
+        run: ./gradlew ktlintCheck
+
+      - name: Lint and Unit Tests
+        run: ./gradlew lintDebug testDebugUnitTest
+
+      - name: Build APK (Debug)
+        run: ./gradlew assembleDebug
