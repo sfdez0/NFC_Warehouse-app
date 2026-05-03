@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -41,10 +42,13 @@ import com.github.sfdez0.nfcwarehouse.ui.theme.NFCWarehouseTheme
  * @param viewModel The [HomeViewModel] responsible for managing the state of this screen.
  */
 @Composable
-fun HomeRoute(viewModel: HomeViewModel = viewModel()) {
+fun HomeRoute(onNavigateToLocation: () -> Unit, viewModel: HomeViewModel = viewModel()) {
     val locations by viewModel.locations.collectAsState()
 
-    HomeScreen(locations)
+    HomeScreen(
+        locationList = locations,
+        onNavigateToLocation = onNavigateToLocation
+    )
 }
 
 /**
@@ -56,7 +60,7 @@ fun HomeRoute(viewModel: HomeViewModel = viewModel()) {
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(locationList: List<Location>) {
+fun HomeScreen(locationList: List<Location>, onNavigateToLocation: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -79,7 +83,7 @@ fun HomeScreen(locationList: List<Location>) {
                 // Use the ID of each location as the key
                 key = { location -> location.id },
             ) { location ->
-                LocationListItem(location)
+                LocationListItem(location, onNavigateToLocation)
             }
         }
     }
@@ -91,7 +95,7 @@ fun HomeScreen(locationList: List<Location>) {
  * @param location The [Location] to display
  */
 @Composable
-fun LocationListItem(location: Location) {
+fun LocationListItem(location: Location, onNavigateToLocation: () -> Unit) {
     // State to track if the item is expanded or not
     var expanded by rememberSaveable { mutableStateOf(false) }
 
@@ -126,6 +130,12 @@ fun LocationListItem(location: Location) {
                             ?: stringResource(R.string.home_location_default_description),
                     style = MaterialTheme.typography.bodyMedium,
                 )
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(
+                    onClick = onNavigateToLocation
+                ) {
+                    Text("Ver")
+                }
             }
         }
     }
@@ -136,7 +146,7 @@ fun LocationListItem(location: Location) {
  */
 @Preview(showBackground = true)
 @Composable
-fun LocationListPreview() {
+fun LocationPreview() {
     // Mock locations for preview
     val mockLocations =
         listOf(
@@ -149,6 +159,8 @@ fun LocationListPreview() {
         )
 
     NFCWarehouseTheme {
-        HomeScreen(mockLocations)
+        HomeScreen(
+            locationList = mockLocations,
+            onNavigateToLocation = {})
     }
 }
