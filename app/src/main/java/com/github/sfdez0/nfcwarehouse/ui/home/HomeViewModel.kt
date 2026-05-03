@@ -27,13 +27,13 @@ class HomeViewModel : ViewModel() {
      * Initialize the ViewModel by fetching the location data.
      */
     init {
-        getLocationData()
+        getLocationsData()
     }
 
     /**
      * Fetch the location data from the API.
      */
-    private fun getLocationData() {
+    private fun getLocationsData() {
         viewModelScope.launch {
             try {
                 val api = ApiService.create()

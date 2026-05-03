@@ -45,11 +45,12 @@ import com.github.sfdez0.nfcwarehouse.ui.theme.NFCWarehouseTheme
  * * This composable acts as a bridge between the [HomeViewModel] and the UI.
  * It collects the locations state flow and passes it down to the stateless [HomeScreen].
  *
+ * @param onNavigateToLocation Callback to navigate to the location screen
  * @param viewModel The [HomeViewModel] responsible for managing the state of this screen.
  */
 @Composable
 fun HomeRoute(
-    onNavigateToLocation: () -> Unit,
+    onNavigateToLocation: (Long) -> Unit,
     viewModel: HomeViewModel = viewModel(),
 ) {
     val locations by viewModel.locations.collectAsState()
@@ -66,12 +67,13 @@ fun HomeRoute(
  * scrollable list of [Location] items.
  *
  * @param locationList List of [Location] elements
+ * @param onNavigateToLocation Callback to navigate to the location screen
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     locationList: List<Location>,
-    onNavigateToLocation: () -> Unit,
+    onNavigateToLocation: (Long) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -117,11 +119,12 @@ fun HomeScreen(
  * Composable for a single [Location] item in the list.
  *
  * @param location The [Location] to display
+ * @param onNavigateToLocation Callback to navigate to the location screen
  */
 @Composable
 fun LocationListItem(
     location: Location,
-    onNavigateToLocation: () -> Unit,
+    onNavigateToLocation: (Long) -> Unit,
 ) {
     // State to track if the item is expanded or not
     var expanded by rememberSaveable { mutableStateOf(false) }
@@ -159,7 +162,9 @@ fun LocationListItem(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Button(
-                    onClick = onNavigateToLocation,
+                    onClick = {
+                        onNavigateToLocation(location.id)
+                    },
                 ) {
                     Text("Ver")
                 }
