@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.github.sfdez0.nfcwarehouse.ui.home.HomeRoute
+import com.github.sfdez0.nfcwarehouse.ui.home.LocationRoute
 import com.github.sfdez0.nfcwarehouse.ui.theme.NFCWarehouseTheme
 
 /**
@@ -24,6 +25,9 @@ class MainActivity : ComponentActivity() {
                 NavHost(navController = navController, startDestination = "home") {
                     composable("home") {
                         HomeRoute()
+
+                    composable("location"){
+                        LocationRoute()
                     }
                 }
             }
