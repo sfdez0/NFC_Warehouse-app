@@ -8,11 +8,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -25,7 +28,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -42,12 +48,15 @@ import com.github.sfdez0.nfcwarehouse.ui.theme.NFCWarehouseTheme
  * @param viewModel The [HomeViewModel] responsible for managing the state of this screen.
  */
 @Composable
-fun HomeRoute(onNavigateToLocation: () -> Unit, viewModel: HomeViewModel = viewModel()) {
+fun HomeRoute(
+    onNavigateToLocation: () -> Unit,
+    viewModel: HomeViewModel = viewModel(),
+) {
     val locations by viewModel.locations.collectAsState()
 
     HomeScreen(
         locationList = locations,
-        onNavigateToLocation = onNavigateToLocation
+        onNavigateToLocation = onNavigateToLocation,
     )
 }
 
@@ -60,7 +69,10 @@ fun HomeRoute(onNavigateToLocation: () -> Unit, viewModel: HomeViewModel = viewM
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(locationList: List<Location>, onNavigateToLocation: () -> Unit) {
+fun HomeScreen(
+    locationList: List<Location>,
+    onNavigateToLocation: () -> Unit,
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -72,7 +84,19 @@ fun HomeScreen(locationList: List<Location>, onNavigateToLocation: () -> Unit) {
                     ),
             )
         },
-        // TODO floatingActionButton
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { }, // TODO Add location screen
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.baseline_add_24),
+                    contentDescription = "Add location",
+                    modifier = Modifier.size(24.dp),
+                    tint = Color.White,
+                )
+            }
+        },
     ) { paddingValues ->
         LazyColumn(
             contentPadding = paddingValues,
@@ -95,7 +119,10 @@ fun HomeScreen(locationList: List<Location>, onNavigateToLocation: () -> Unit) {
  * @param location The [Location] to display
  */
 @Composable
-fun LocationListItem(location: Location, onNavigateToLocation: () -> Unit) {
+fun LocationListItem(
+    location: Location,
+    onNavigateToLocation: () -> Unit,
+) {
     // State to track if the item is expanded or not
     var expanded by rememberSaveable { mutableStateOf(false) }
 
@@ -132,7 +159,7 @@ fun LocationListItem(location: Location, onNavigateToLocation: () -> Unit) {
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Button(
-                    onClick = onNavigateToLocation
+                    onClick = onNavigateToLocation,
                 ) {
                     Text("Ver")
                 }
@@ -161,6 +188,7 @@ fun LocationPreview() {
     NFCWarehouseTheme {
         HomeScreen(
             locationList = mockLocations,
-            onNavigateToLocation = {})
+            onNavigateToLocation = {},
+        )
     }
 }

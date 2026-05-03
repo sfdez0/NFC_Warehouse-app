@@ -25,11 +25,11 @@ class MainActivity : ComponentActivity() {
                 NavHost(navController = navController, startDestination = "home") {
                     composable("home") {
                         HomeRoute(
-                            onNavigateToLocation = { navController.navigate("location") }
+                            onNavigateToLocation = { navController.navigate("location") },
                         )
                     }
 
-                    composable("location"){
+                    composable("location") {
                         LocationRoute()
                     }
                 }

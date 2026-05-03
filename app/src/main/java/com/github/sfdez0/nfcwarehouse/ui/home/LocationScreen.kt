@@ -59,16 +59,16 @@ fun LocationScreen() {
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { }, // TODO Add storage space screen
-                containerColor = MaterialTheme.colorScheme.primaryContainer
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
             ) {
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.baseline_add_24),
                     contentDescription = "Add location",
                     modifier = Modifier.size(24.dp),
-                    tint = Color.White
+                    tint = Color.White,
                 )
             }
-        }
+        },
     ) { paddingValues ->
         Text(
             text = "ID",
