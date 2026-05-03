@@ -4,6 +4,7 @@ import com.github.sfdez0.nfcwarehouse.data.model.Location
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Path
 
 /**
  * API functions
@@ -14,6 +15,14 @@ interface ApiService {
      */
     @GET("/api/v1/locations")
     suspend fun getLocations(): List<Location>
+
+    /**
+     * GET /api/v1/locations/{id}
+     */
+    @GET("/api/v1/locations/{id}")
+    suspend fun getLocationById(
+        @Path("id") id: Long,
+    ): Location
 
     /**
      * Companion object to create the ApiService
