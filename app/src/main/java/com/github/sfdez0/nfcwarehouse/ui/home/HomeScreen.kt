@@ -178,7 +178,7 @@ fun LocationListItem(
  */
 @Preview(showBackground = true)
 @Composable
-fun LocationPreview() {
+fun LocationListPreview() {
     // Mock locations for preview
     val mockLocations =
         listOf(
