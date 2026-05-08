@@ -166,7 +166,7 @@ fun LocationListItem(
                         onNavigateToLocation(location.id)
                     },
                 ) {
-                    Text("Ver")
+                    Text(stringResource(R.string.view_button))
                 }
             }
         }

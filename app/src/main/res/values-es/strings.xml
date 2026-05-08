@@ -2,4 +2,5 @@
 <resources>
     <string name="app_name">NFC Warehouse</string>
     <string name="home_location_default_description">Sin descripción</string>
+    <string name="view_button">Ver</string>
 </resources>

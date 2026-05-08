@@ -39,7 +39,7 @@ class HomeViewModel : ViewModel() {
                 val api = ApiService.create()
                 _locations.value = api.getLocations()
             } catch (e: Exception) {
-                Log.e("NFCW", "Error retrieving location data; API might be unreachable")
+                Log.e("NFCW", "Error retrieving location data: ${e.message}")
             }
         }
     }
