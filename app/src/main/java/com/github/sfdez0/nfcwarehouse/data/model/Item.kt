@@ -1,18 +1,23 @@
 package com.github.sfdez0.nfcwarehouse.data.model
 
 /**
- * Class that represents a Storage Space inside a Location
- * TODO
+ * Class that represents an Item
  */
-class StorageSpaces(
+class Item(
     /**
-     * StorageSpace ID
+     * Item ID
      */
     val id: Long? = null,
     /**
-     * StorageSpace name
+     * Item name
      */
     val name: String? = null,
+    /**
+     * Item quantity
+     */
     val quantity: Int? = null,
+    /**
+     * Storage Space ID where the Item is located
+     */
     val storageSpaceId: Long? = null,
 )

@@ -19,5 +19,5 @@ class Location(
     /**
      * List of StorageSpaces inside the Location
      */
-    val storageSpaces: MutableList<StorageSpaces>,
+    val storageSpaces: MutableList<StorageSpace>,
 )
