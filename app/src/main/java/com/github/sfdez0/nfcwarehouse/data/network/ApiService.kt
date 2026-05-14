@@ -1,6 +1,7 @@
 package com.github.sfdez0.nfcwarehouse.data.network
 
 import com.github.sfdez0.nfcwarehouse.data.model.Location
+import com.github.sfdez0.nfcwarehouse.data.model.StorageSpace
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
@@ -23,6 +24,14 @@ interface ApiService {
     suspend fun getLocationById(
         @Path("id") id: Long,
     ): Location
+
+    /**
+     * GET /api/v1/storagespaces/{id}
+     */
+    @GET("/api/v1/storagespaces/{id}")
+    suspend fun getStorageSpaceById(
+        @Path("id") id: Long,
+    ): StorageSpace
 
     /**
      * Companion object to create the ApiService
