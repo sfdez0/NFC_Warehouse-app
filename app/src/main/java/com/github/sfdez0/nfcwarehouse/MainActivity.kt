@@ -10,6 +10,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.github.sfdez0.nfcwarehouse.ui.home.HomeRoute
 import com.github.sfdez0.nfcwarehouse.ui.home.LocationRoute
+import com.github.sfdez0.nfcwarehouse.ui.home.StorageSpaceRoute
 import com.github.sfdez0.nfcwarehouse.ui.theme.NFCWarehouseTheme
 
 /**
@@ -29,17 +30,30 @@ class MainActivity : ComponentActivity() {
                         HomeRoute(
                             // Callback to navigate to the location screen with the given ID
                             onNavigateToLocation = { id ->
-                                navController.navigate("location/$id")
+                                navController.navigate("locations/$id")
                             },
                         )
                     }
 
                     composable(
-                        route = "location/{id}",
+                        route = "locations/{id}",
                         arguments = listOf(navArgument("id") { type = NavType.LongType }),
                     ) { backStackEntry ->
                         val id = backStackEntry.arguments?.getLong("id")
-                        LocationRoute(locationId = id ?: -1L)
+                        LocationRoute(
+                            locationId = id ?: -1L,
+                            onNavigateToStorageSpace = { id ->
+                                navController.navigate("storagespaces/$id")
+                            },
+                        )
+                    }
+
+                    composable(
+                        route = "storagespaces/{id}",
+                        arguments = listOf(navArgument("id") { type = NavType.LongType }),
+                    ) { backStackEntry ->
+                        val id = backStackEntry.arguments?.getLong("id")
+                        StorageSpaceRoute(storageSpaceId = id ?: -1L)
                     }
                 }
             }

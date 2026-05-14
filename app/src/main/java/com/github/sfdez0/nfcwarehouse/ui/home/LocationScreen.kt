@@ -51,11 +51,13 @@ import com.github.sfdez0.nfcwarehouse.ui.theme.NFCWarehouseTheme
  * It collects the locations state flow and passes it down to the stateless [LocationScreen].
  *
  * @param locationId The ID of the location to display
+ * @param onNavigateToStorageSpace Callback to navigate to the storage space screen
  * @param viewModel The [LocationViewModel] responsible for managing the state of this screen.
  */
 @Composable
 fun LocationRoute(
     locationId: Long,
+    onNavigateToStorageSpace: (Long) -> Unit,
     viewModel: LocationViewModel = viewModel(),
 ) {
     LaunchedEffect(key1 = locationId) {
@@ -64,7 +66,10 @@ fun LocationRoute(
 
     val location by viewModel.location.collectAsState()
 
-    LocationScreen(location)
+    LocationScreen(
+        location = location,
+        onNavigateToStorageSpace = onNavigateToStorageSpace,
+    )
 }
 
 /**
@@ -76,7 +81,10 @@ fun LocationRoute(
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LocationScreen(location: Location?) {
+fun LocationScreen(
+    location: Location?,
+    onNavigateToStorageSpace: (Long) -> Unit,
+) {
     if (location == null) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -151,8 +159,8 @@ fun LocationScreen(location: Location?) {
                         items = location.storageSpaces,
                         // Use the ID of each storage space as the key
                         key = { storageSpace -> storageSpace.id },
-                    ) { location ->
-                        StorageSpaceListItem(location)
+                    ) { storageSpace ->
+                        StorageSpaceListItem(storageSpace, onNavigateToStorageSpace)
                     }
                 }
             }
@@ -166,11 +174,14 @@ fun LocationScreen(location: Location?) {
  * @param storageSpace The [StorageSpace] to display
  */
 @Composable
-fun StorageSpaceListItem(storageSpace: StorageSpace) {
+fun StorageSpaceListItem(
+    storageSpace: StorageSpace,
+    onNavigateToStorageSpace: (Long) -> Unit,
+) {
     // State to track if the item is expanded or not
     var expanded by rememberSaveable { mutableStateOf(false) }
 
-    // Card for the location item
+    // Card for the storage space
     Card(
         modifier =
             Modifier
@@ -208,12 +219,12 @@ fun StorageSpaceListItem(storageSpace: StorageSpace) {
                 style = MaterialTheme.typography.bodyMedium,
             )
 
-            // TODO Expand logic
+            // If expanded, display the button to access the storage space
             if (expanded) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Button(
                     onClick = {
-                        // TODO
+                        onNavigateToStorageSpace(storageSpace.id)
                     },
                 ) {
                     Text(stringResource(R.string.view_button))
@@ -258,6 +269,9 @@ fun LocationPreview() {
         )
 
     NFCWarehouseTheme {
-        LocationScreen(locationMock)
+        LocationScreen(
+            location = locationMock,
+            onNavigateToStorageSpace = {},
+        )
     }
 }
