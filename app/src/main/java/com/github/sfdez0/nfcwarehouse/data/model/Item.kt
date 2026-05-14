@@ -7,17 +7,17 @@ class Item(
     /**
      * Item ID
      */
-    val id: Long? = null,
+    val id: Long,
     /**
      * Item name
      */
-    val name: String? = null,
+    val name: String,
     /**
      * Item quantity
      */
-    val quantity: Int? = null,
+    val quantity: Long,
     /**
      * Storage Space ID where the Item is located
      */
-    val storageSpaceId: Long? = null,
+    val storageSpaceId: Long,
 )
