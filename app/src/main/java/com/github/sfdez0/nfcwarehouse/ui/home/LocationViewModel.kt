@@ -30,7 +30,9 @@ class LocationViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val api = ApiService.create()
-                _location.value = api.getLocationById(id)
+                val result = api.getLocationById(id)
+                result.storageSpaces.sortBy { it.id }
+                _location.value = result
             } catch (e: Exception) {
                 Log.e("NFCW", "Error retrieving location data; API might be unreachable")
             }

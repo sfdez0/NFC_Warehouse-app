@@ -30,7 +30,9 @@ class StorageSpaceViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val api = ApiService.create()
-                _storageSpace.value = api.getStorageSpaceById(id)
+                val result = api.getStorageSpaceById(id)
+                result.items.sortBy { it.id }
+                _storageSpace.value = result
             } catch (e: Exception) {
                 Log.e("NFCW", "Error retrieving storage space data; API might be unreachable")
             }

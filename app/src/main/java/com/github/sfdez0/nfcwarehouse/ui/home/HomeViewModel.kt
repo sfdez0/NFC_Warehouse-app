@@ -37,7 +37,7 @@ class HomeViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val api = ApiService.create()
-                _locations.value = api.getLocations()
+                _locations.value = api.getLocations().sortedBy { it.id }
             } catch (e: Exception) {
                 Log.e("NFCW", "Error retrieving location data: ${e.message}")
             }
