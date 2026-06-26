@@ -75,6 +75,9 @@ fun HomeScreen(
     locationList: List<Location>,
     onNavigateToLocation: (Long) -> Unit,
 ) {
+    // State to track which item is currently expanded
+    var expandedLocationId by rememberSaveable { mutableStateOf<Long?>(null) }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -109,7 +112,14 @@ fun HomeScreen(
                 // Use the ID of each location as the key
                 key = { location -> location.id },
             ) { location ->
-                LocationListItem(location, onNavigateToLocation)
+                LocationListItem(
+                    location = location,
+                    expanded = expandedLocationId == location.id,
+                    onExpandClick = {
+                        expandedLocationId = if (expandedLocationId == location.id) null else location.id
+                    },
+                    onNavigateToLocation = onNavigateToLocation,
+                )
             }
         }
     }
@@ -119,16 +129,17 @@ fun HomeScreen(
  * Composable for a single [Location] item in the list.
  *
  * @param location The [Location] to display
+ * @param expanded Whether the item is expanded
+ * @param onExpandClick Callback when the item is clicked to expand/collapse
  * @param onNavigateToLocation Callback to navigate to the location screen
  */
 @Composable
 fun LocationListItem(
     location: Location,
+    expanded: Boolean,
+    onExpandClick: () -> Unit,
     onNavigateToLocation: (Long) -> Unit,
 ) {
-    // State to track if the item is expanded or not
-    var expanded by rememberSaveable { mutableStateOf(false) }
-
     // Card for the location item
     Card(
         modifier =
@@ -140,7 +151,7 @@ fun LocationListItem(
         Column(
             modifier =
                 Modifier
-                    .clickable { expanded = !expanded }
+                    .clickable { onExpandClick() }
                     .padding(16.dp)
                     .fillMaxWidth(),
         ) {

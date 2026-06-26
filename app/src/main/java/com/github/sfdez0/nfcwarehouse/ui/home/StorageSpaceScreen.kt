@@ -77,6 +77,9 @@ fun StorageSpaceRoute(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StorageSpaceScreen(storageSpace: StorageSpace?) {
+    // State to track which item is currently expanded
+    var expandedItemId by rememberSaveable { mutableStateOf<Long?>(null) }
+
     if (storageSpace == null) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -147,7 +150,13 @@ fun StorageSpaceScreen(storageSpace: StorageSpace?) {
                         // Use the ID of each storage space as the key
                         key = { item -> item.id },
                     ) { item ->
-                        ItemListItem(item)
+                        ItemListItem(
+                            item = item,
+                            expanded = expandedItemId == item.id,
+                            onExpandClick = {
+                                expandedItemId = if (expandedItemId == item.id) null else item.id
+                            },
+                        )
                     }
                 }
             }
@@ -159,12 +168,15 @@ fun StorageSpaceScreen(storageSpace: StorageSpace?) {
  * Composable for a single [Item] in the list.
  *
  * @param item The [Item] to display
+ * @param expanded Whether the item is expanded
+ * @param onExpandClick Callback when the item is clicked to expand/collapse
  */
 @Composable
-fun ItemListItem(item: Item) {
-    // State to track if the item is expanded or not
-    var expanded by rememberSaveable { mutableStateOf(false) }
-
+fun ItemListItem(
+    item: Item,
+    expanded: Boolean,
+    onExpandClick: () -> Unit,
+) {
     // Card for the item
     Card(
         modifier =
@@ -176,7 +188,7 @@ fun ItemListItem(item: Item) {
         Column(
             modifier =
                 Modifier
-                    .clickable { expanded = !expanded }
+                    .clickable { onExpandClick() }
                     .padding(16.dp)
                     .fillMaxWidth(),
         ) {

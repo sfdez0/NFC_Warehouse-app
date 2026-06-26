@@ -85,6 +85,9 @@ fun LocationScreen(
     location: Location?,
     onNavigateToStorageSpace: (Long) -> Unit,
 ) {
+    // State to track which storage space is currently expanded
+    var expandedStorageSpaceId by rememberSaveable { mutableStateOf<Long?>(null) }
+
     if (location == null) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -160,7 +163,15 @@ fun LocationScreen(
                         // Use the ID of each storage space as the key
                         key = { storageSpace -> storageSpace.id },
                     ) { storageSpace ->
-                        StorageSpaceListItem(storageSpace, onNavigateToStorageSpace)
+                        StorageSpaceListItem(
+                            storageSpace = storageSpace,
+                            expanded = expandedStorageSpaceId == storageSpace.id,
+                            onExpandClick = {
+                                expandedStorageSpaceId =
+                                    if (expandedStorageSpaceId == storageSpace.id) null else storageSpace.id
+                            },
+                            onNavigateToStorageSpace = onNavigateToStorageSpace,
+                        )
                     }
                 }
             }
@@ -172,15 +183,17 @@ fun LocationScreen(
  * Composable for a single [StorageSpace] item in the list.
  *
  * @param storageSpace The [StorageSpace] to display
+ * @param expanded Whether the item is expanded
+ * @param onExpandClick Callback when the item is clicked to expand/collapse
+ * @param onNavigateToStorageSpace Callback to navigate to the storage space screen
  */
 @Composable
 fun StorageSpaceListItem(
     storageSpace: StorageSpace,
+    expanded: Boolean,
+    onExpandClick: () -> Unit,
     onNavigateToStorageSpace: (Long) -> Unit,
 ) {
-    // State to track if the item is expanded or not
-    var expanded by rememberSaveable { mutableStateOf(false) }
-
     // Card for the storage space
     Card(
         modifier =
@@ -192,7 +205,7 @@ fun StorageSpaceListItem(
         Column(
             modifier =
                 Modifier
-                    .clickable { expanded = !expanded }
+                    .clickable { onExpandClick() }
                     .padding(16.dp)
                     .fillMaxWidth(),
         ) {
