@@ -22,9 +22,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -35,6 +37,9 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.sfdez0.nfcwarehouse.R
 import com.github.sfdez0.nfcwarehouse.data.model.Location
@@ -78,6 +83,25 @@ fun HomeScreen(
     // State to track which item is currently expanded
     var expandedLocationId by rememberSaveable { mutableStateOf<Long?>(null) }
 
+    // State to track if navigation is in progress to avoid duplicate clicks
+    var isNavigationInProgress by remember { mutableStateOf(false) }
+
+    // Reset navigation state when returning to this screen
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        // Create an observer to reset the navigation state when the lifecycle is on Resume
+        val observer =
+            LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_RESUME) {
+                    isNavigationInProgress = false
+                }
+            }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -115,10 +139,16 @@ fun HomeScreen(
                 LocationListItem(
                     location = location,
                     expanded = expandedLocationId == location.id,
+                    enabled = !isNavigationInProgress,
                     onExpandClick = {
                         expandedLocationId = if (expandedLocationId == location.id) null else location.id
                     },
-                    onNavigateToLocation = onNavigateToLocation,
+                    onButtonClick = { id ->
+                        if (!isNavigationInProgress) {
+                            isNavigationInProgress = true
+                            onNavigateToLocation(id)
+                        }
+                    },
                 )
             }
         }
@@ -131,14 +161,15 @@ fun HomeScreen(
  * @param location The [Location] to display
  * @param expanded Whether the item is expanded
  * @param onExpandClick Callback when the item is clicked to expand/collapse
- * @param onNavigateToLocation Callback to navigate to the location screen
+ * @param onButtonClick Callback to navigate to the location screen
  */
 @Composable
 fun LocationListItem(
     location: Location,
     expanded: Boolean,
+    enabled: Boolean,
     onExpandClick: () -> Unit,
-    onNavigateToLocation: (Long) -> Unit,
+    onButtonClick: (Long) -> Unit,
 ) {
     // Card for the location item
     Card(
@@ -151,7 +182,7 @@ fun LocationListItem(
         Column(
             modifier =
                 Modifier
-                    .clickable { onExpandClick() }
+                    .clickable(enabled = enabled) { onExpandClick() }
                     .padding(16.dp)
                     .fillMaxWidth(),
         ) {
@@ -173,9 +204,8 @@ fun LocationListItem(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Button(
-                    onClick = {
-                        onNavigateToLocation(location.id)
-                    },
+                    onClick = { onButtonClick(location.id) },
+                    enabled = enabled,
                 ) {
                     Text(stringResource(R.string.view_button))
                 }

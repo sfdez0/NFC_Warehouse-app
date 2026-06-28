@@ -24,10 +24,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -39,6 +41,9 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.sfdez0.nfcwarehouse.R
 import com.github.sfdez0.nfcwarehouse.data.model.Location
@@ -87,6 +92,25 @@ fun LocationScreen(
 ) {
     // State to track which storage space is currently expanded
     var expandedStorageSpaceId by rememberSaveable { mutableStateOf<Long?>(null) }
+
+    // State to track if navigation is in progress to avoid duplicate clicks
+    var isNavigationInProgress by remember { mutableStateOf(false) }
+
+    // Reset navigation state when returning to this screen
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        // Create an observer to reset the navigation state when the lifecycle is on Resume
+        val observer =
+            LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_RESUME) {
+                    isNavigationInProgress = false
+                }
+            }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
     if (location == null) {
         Box(
@@ -166,11 +190,17 @@ fun LocationScreen(
                         StorageSpaceListItem(
                             storageSpace = storageSpace,
                             expanded = expandedStorageSpaceId == storageSpace.id,
+                            enabled = !isNavigationInProgress,
                             onExpandClick = {
                                 expandedStorageSpaceId =
                                     if (expandedStorageSpaceId == storageSpace.id) null else storageSpace.id
                             },
-                            onNavigateToStorageSpace = onNavigateToStorageSpace,
+                            onButtonClick = { id ->
+                                if (!isNavigationInProgress) {
+                                    isNavigationInProgress = true
+                                    onNavigateToStorageSpace(id)
+                                }
+                            },
                         )
                     }
                 }
@@ -185,14 +215,15 @@ fun LocationScreen(
  * @param storageSpace The [StorageSpace] to display
  * @param expanded Whether the item is expanded
  * @param onExpandClick Callback when the item is clicked to expand/collapse
- * @param onNavigateToStorageSpace Callback to navigate to the storage space screen
+ * @param onButtonClick Callback to navigate to the storage space screen
  */
 @Composable
 fun StorageSpaceListItem(
     storageSpace: StorageSpace,
     expanded: Boolean,
+    enabled: Boolean,
     onExpandClick: () -> Unit,
-    onNavigateToStorageSpace: (Long) -> Unit,
+    onButtonClick: (Long) -> Unit,
 ) {
     // Card for the storage space
     Card(
@@ -205,7 +236,7 @@ fun StorageSpaceListItem(
         Column(
             modifier =
                 Modifier
-                    .clickable { onExpandClick() }
+                    .clickable(enabled = enabled) { onExpandClick() }
                     .padding(16.dp)
                     .fillMaxWidth(),
         ) {
@@ -236,9 +267,8 @@ fun StorageSpaceListItem(
             if (expanded) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Button(
-                    onClick = {
-                        onNavigateToStorageSpace(storageSpace.id)
-                    },
+                    onClick = { onButtonClick(storageSpace.id) },
+                    enabled = enabled,
                 ) {
                     Text(stringResource(R.string.view_button))
                 }
